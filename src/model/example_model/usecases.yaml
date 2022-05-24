@@ -1,0 +1,15 @@
+import:
+  - example_model.yaml
+usecase:
+  name: UpdateState
+  description: ServiceOne generates and sends a new timestamp to the database
+  participants:
+    - name: svc1
+      type: namespace1.ServiceOne
+    - name: database
+      type: namespace1.Database
+  steps:
+    - name: Send new timestamp to the database
+      source: namespace1.ServiceOne
+      target: namespace1.Database
+      action: sendTimestamp

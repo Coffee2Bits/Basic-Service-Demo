@@ -1,7 +1,5 @@
 schema:
-  name: Message
+  name: Timestamp
   fields:
-  - name: body
-    type: string
-  - name: sender
-    type: string
+  - name: time
+    type: date

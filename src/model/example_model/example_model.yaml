@@ -1,23 +1,78 @@
+model:
+  name: DemoSystem
+  components:
+    - name: svc1
+      type: namespace1.ServiceOne
+    - name: svc2
+      type: namespace1.ServiceTwo
+    - name: database
+      type: namespace1.Database
+---
 import:
   - ./message.yaml
 model:
-  name: EchoExample
-  description: This is a message mirroring model (echo).
+  name: namespace1.ServiceOne
+  description: Service that creates timestamps.
   behavior:
-    - name: Echo
-      type: request-response
-      description: Return a response with identical content to the request.
-      input:
-        - name: inbound
-          type: Message
+    - name: GenerateTimestamp
+      type: timer
+      description: Generate a timestamp every 5 seconds.
       output:
-        - name: outbound
-          type: Message
+        - name: outbound_timestamp
+          type: Timestamp
       acceptance:
-        - scenario: onReceive
+        - scenario: GenerateTimestampEvery5S
           given:
-           - The EchoExample service is running.
+           - ServiceOne is running.
           when:
-            - The user sends a message to EchoExample.
+            - something
           then:
             - The user receives the same message from EchoExample.
+---
+import:
+  - ./message.yaml
+  - ./extension.yaml
+model:
+  name: namespace1.ServiceTwo
+  description: Service that consumes timestamps.
+  behavior:
+    - name: ConsumeTimestamp
+      type: callback
+      description: Function to consume timestamps triggered by state modification.
+      input:
+        - name: inbound_timestamp
+          type: Timestamp
+      acceptance:
+        - scenario: ConsumeTimestampOnStateModification
+          given:
+           - ServiceTwo is running.
+          when:
+            - something
+          then:
+            - The user receives the same message from EchoExample.
+---
+import:
+  - ./message.yaml
+model:
+  name: namespace1.Database
+  description: Database for storing timestamps.
+  behavior:
+    - name: ConsumeTimestamp
+      type: callback
+      description: Function to consume timestamps triggered by state modification.
+      input:
+        - name: inbound_timestamp
+          type: Timestamp
+      output:
+        - name: outbound_timestamp
+          type: Timestamp
+      acceptance:
+        - scenario: OnReceiveTimestampTriggerCallback
+          given:
+            - ServiceOne is running.
+            - ServiceTwo is running.
+          when:
+            - The database recieves a timestamp message
+          then:
+            - The database updates its content with the timestamp
+            - Timestamp message is sent to ServiceTwo

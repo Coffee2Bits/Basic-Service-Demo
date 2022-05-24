@@ -1,0 +1,6 @@
+ext:
+  name: CallbackBehaviorTypeExtension
+  type: BehaviorType
+  enumExt:
+    add:
+      - callback
